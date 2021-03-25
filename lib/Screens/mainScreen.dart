@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_express_rider/Data/appData.dart';
+import 'package:taxi_express_rider/Models/directionDetails.dart';
 import 'package:taxi_express_rider/Widgets/SearchDivider.dart';
 import 'package:taxi_express_rider/Widgets/createMap2.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,7 +29,7 @@ class MainScreen extends StatefulWidget {
 }
 
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
 
 
   Completer<GoogleMapController> _controller = Completer();
@@ -38,6 +39,37 @@ class _MainScreenState extends State<MainScreen> {
   Set<Marker> markerSet = {};
   Set<Circle> circleSet = {};
 
+  double rideDetailsContainerHeight = 0;
+  double searchContainerHeight = 290;
+
+  bool drawerOpen = true;
+
+  resetApp(){
+    setState(() {
+      drawerOpen = true;
+      searchContainerHeight = 290;
+      rideDetailsContainerHeight = 0;
+      bottomPaddingOfMap = 245.0;
+
+      polylineSet.clear();
+      markerSet.clear();
+      circleSet.clear();
+      polylineCoordinates.clear();
+    });
+
+    locatePosition();
+  }
+
+  void displayRideDetailsContainer() async{
+     await getPlaceDirection();
+
+     setState(() {
+       searchContainerHeight = 0;
+       rideDetailsContainerHeight = 245.0;
+       bottomPaddingOfMap = 245.0;
+       drawerOpen = false;
+     });
+  }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
@@ -48,6 +80,7 @@ class _MainScreenState extends State<MainScreen> {
 
 
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  DirectionDetails tripDirectionDetails;
 
   Position currentPosition;
   var geoLocator = Geolocator();
@@ -197,17 +230,21 @@ class _MainScreenState extends State<MainScreen> {
               setState(() {
                 bottomPaddingOfMap = 290.0;
               });
-
               locatePosition();
             },
           ),
 
           Positioned(
-            top: 45.0,
+            top: 38.0,
             left: 22.0,
             child: GestureDetector(
               onTap: (){
-                scaffoldKey.currentState.openDrawer();
+                if(drawerOpen){
+                  scaffoldKey.currentState.openDrawer();
+                }
+                else{
+                  resetApp();
+                }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -227,7 +264,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: CircleAvatar(
                   backgroundColor: Color.fromRGBO(146, 27, 31, 1),
                   child: Icon(
-                    Icons.menu_rounded,
+                    (drawerOpen) ? Icons.menu_rounded : Icons.close_rounded,
                     color: Colors.black,
                   ),
                   radius: 20.0,
@@ -240,149 +277,154 @@ class _MainScreenState extends State<MainScreen> {
             left: 0.0,
             right: 0.0,
             bottom: 0.0,
-            child: Container(
-              height: 290,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 16.0,
-                      spreadRadius: 0.5,
-                      offset: Offset(0.7,0.7),
-                    )
-                  ]
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18.0,
-                    horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 6.0,
+            child: AnimatedSize(
+              vsync: this,
+              curve: Curves.bounceIn,
+              duration: new Duration(milliseconds: 160),
+              child: Container(
+                height: searchContainerHeight,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      topRight: Radius.circular(15.0),
                     ),
-                    Text(
-                      "Hello.",
-                      style: TextStyle(
-                        fontSize: 15.0,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black,
+                        blurRadius: 16.0,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7,0.7),
+                      )
+                    ]
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18.0,
+                      horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 6.0,
                       ),
-                    ),
-                    SizedBox(
-                      height: 2.0,
-                    ),
-                    Text(
-                      "Where to?",
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        var res = await Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-                        if(res == "obtainDirection"){
-                          await getPlaceDirection();
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[500].withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(50.0),
-                          /*boxShadow: [
-                              BoxShadow(
-                                color: Colors.black54,
-                                blurRadius: 6.0,
-                                spreadRadius: 0.5,
-                                offset: Offset(0.7,0.7),
-                              ),
-                            ]*/
+                      Text(
+                        "Hello.",
+                        style: TextStyle(
+                          fontSize: 15.0,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                height: 30,
-                                width: 10.0,
-                              ),
-                              Icon(
-                                FontAwesomeIcons.search,
-                                color: Color.fromRGBO(146, 27, 31, 1),
-                              ),
-                              SizedBox(
-                                height: 20,
-                                width: 10.0,
-                              ),
-                              Text(
-                                "Search",
-                                style: TextStyle(
-                                  fontSize: 16,
+                      ),
+                      SizedBox(
+                        height: 2.0,
+                      ),
+                      Text(
+                        "Where to?",
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          var res = await Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
+                          if(res == "obtainDirection"){
+                            displayRideDetailsContainer();
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[500].withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(50.0),
+                            /*boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black54,
+                                  blurRadius: 6.0,
+                                  spreadRadius: 0.5,
+                                  offset: Offset(0.7,0.7),
                                 ),
-                              ),
-                            ],
+                              ]*/
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  width: 10.0,
+                                ),
+                                Icon(
+                                  FontAwesomeIcons.search,
+                                  color: Color.fromRGBO(146, 27, 31, 1),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                  width: 10.0,
+                                ),
+                                Text(
+                                  "Search",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 24.0,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.mapMarkerAlt,
-                          color: Colors.grey,
-                          size: 30,
-                        ),
-                        SizedBox(
-                          width: 12.0,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Your Current Location",
-                              style: TextStyle(
-                                color: Color.fromRGBO(146, 27, 31, 1),
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                              ),),
-                            SizedBox(height: 7.0,),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minWidth: 300.0,
-                                maxWidth: 310.0,
-                                minHeight: 10.0,
-                                maxHeight: 80.0,
-                              ),
-                              child: Text(
-                                Provider.of<AppData>(context).pickUpLocation !=
-                                    null ? Provider.of<AppData>(context)
-                                    .pickUpLocation.placeName : "Your Current Location",
+                      SizedBox(
+                        height: 24.0,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.mapMarkerAlt,
+                            color: Colors.grey,
+                            size: 30,
+                          ),
+                          SizedBox(
+                            width: 12.0,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Your Current Location",
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontStyle: FontStyle.italic,
+                                  color: Color.fromRGBO(146, 27, 31, 1),
+                                  fontSize: 13.0,
                                   fontWeight: FontWeight.bold,
+                                ),),
+                              SizedBox(height: 7.0,),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minWidth: 300.0,
+                                  maxWidth: 310.0,
+                                  minHeight: 10.0,
+                                  maxHeight: 80.0,
+                                ),
+                                child: Text(
+                                  Provider.of<AppData>(context).pickUpLocation !=
+                                      null ? Provider.of<AppData>(context)
+                                      .pickUpLocation.placeName : "Your Current Location",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 13.0,
-                    ),
-                    DividerWidget(),
-                    SizedBox(height: 16.0,),
-                  ],
+                            ],
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 13.0,
+                      ),
+                      DividerWidget(),
+                      SizedBox(height: 16.0,),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -391,46 +433,126 @@ class _MainScreenState extends State<MainScreen> {
             bottom: 0.0,
             left: 0.0,
             right: 0.0,
-            child: Container(
-              height: 300.0,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0),),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 16.0,
-                      spreadRadius: 0.5,
-                      offset: Offset(0.7, 0.7),
-                    ),
-                  ]
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    color: Colors.tealAccent,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        children: [
-                          Image.asset("images\\taxi.png", height: 70.0, width: 80.0,),
-                          SizedBox(width: 16.0,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Car",
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              Text("10Km")
-                            ],
-                          )
-                        ],
+            child: AnimatedSize(
+              vsync: this,
+              curve: Curves.bounceIn,
+              duration: new Duration(milliseconds: 160),
+              child: Container(
+                height: rideDetailsContainerHeight,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0),),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black,
+                        blurRadius: 16.0,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7, 0.7),
                       ),
-                    ),
-                  )
-                ],
+                    ]
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical : 17.0),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: Color.fromRGBO(146, 27, 31, 0.7),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Image.asset("images\\taxi.png", height: 70.0, width: 80.0,),
+                              SizedBox(width: 16.0,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Car",
+                                    style: TextStyle(fontSize: 18.0),
+                                  ),
+                                  Text(
+                                    ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText : ''),
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                child: Container(),
+                              ),
+                              Text(
+                                ((tripDirectionDetails != null) ? '\$${AssistantMethods.calculateFares(tripDirectionDetails)}' : ''),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 20.0,),
+
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.moneyCheckAlt,
+                              size: 16.0,
+                              color: Colors.black45,
+                            ),
+                            SizedBox(width: 16.0,),
+                            Text("Cash",
+                            style: TextStyle(
+                              height: 1.6,
+                            ),),
+                            SizedBox(width: 6.0,),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.black45,
+                              size: 16.0,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 24.0,),
+
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        // ignore: deprecated_member_use
+                        child: RaisedButton(
+                          onPressed: () {
+                            print("clicked");
+                          },
+                          color: Theme.of(context).accentColor,
+                          child: Padding(
+                            padding: EdgeInsets.all(17.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Request",
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Icon(
+                                  FontAwesomeIcons.taxi,
+                                  color: Colors.white,
+                                  size: 26.0,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -452,7 +574,10 @@ class _MainScreenState extends State<MainScreen> {
     );
 
     var details = await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, destinationLatLng);
-    
+    setState(() {
+      tripDirectionDetails = details;
+    });
+
     Navigator.pop(context);
 
     print("encoded points");
@@ -493,7 +618,7 @@ class _MainScreenState extends State<MainScreen> {
      latLngBounds = LatLngBounds(southwest: LatLng(pickUpLatLng.latitude, destinationLatLng.longitude), northeast: LatLng(destinationLatLng
          .latitude, pickUpLatLng.longitude));
    }
-   else if(pickUpLatLng.longitude > destinationLatLng.longitude){
+   else if(pickUpLatLng.latitude > destinationLatLng.latitude){
      latLngBounds = LatLngBounds(southwest: LatLng(destinationLatLng.latitude, pickUpLatLng.longitude), northeast: LatLng(pickUpLatLng
          .latitude, destinationLatLng.longitude));
    }
