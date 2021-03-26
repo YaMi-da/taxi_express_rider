@@ -24,11 +24,18 @@ class CreateNewAccount extends StatelessWidget {
   TextEditingController _email = TextEditingController();
   TextEditingController _pass = TextEditingController();
   TextEditingController _confirmPass = TextEditingController();
-
+  TextEditingController _phone = TextEditingController();
 
   String validateUser(value){
     if(value.isEmpty)
       return "*Username Required.";
+    else
+      return null;
+  }
+
+  String validatePhone(value){
+    if(value.isEmpty)
+      return "*Phone Number Required.";
     else
       return null;
   }
@@ -74,7 +81,7 @@ class CreateNewAccount extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: size.width * 0.01,
+                SizedBox(height: size.width * 0.0,
                 ),
                 Stack(
                   children: [
@@ -240,6 +247,61 @@ class CreateNewAccount extends StatelessWidget {
                                     EmailValidator(errorText: "Not a Valid Email."),
                                   ]
                               ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                          child : Center(
+                            child: TextFormField(
+                              cursorColor: Colors.white,
+                              decoration: InputDecoration(
+                                contentPadding: new EdgeInsets.symmetric(vertical: 25.0, horizontal: 10.0),
+                                filled: true,
+                                fillColor: Colors.grey[500].withOpacity(0.3),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.transparent, width: 1, style: BorderStyle.solid),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                errorBorder: new OutlineInputBorder(
+                                  borderSide: new BorderSide(color: Colors.red, width: 3.0),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                focusedErrorBorder: new OutlineInputBorder(
+                                  borderSide: new BorderSide(color: Colors.red, width: 3.0),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                errorStyle: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: 'Phone Number',
+                                hintStyle: TextStyle(
+                                  color: Colors.white70,
+                                ),
+                                prefixIcon: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                  child: Icon(
+                                    FontAwesomeIcons.phone,
+                                    size: 28,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              controller: _phone,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                height: 1.5,
+                              ),
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              validator: validatePhone,
                             ),
                           ),
                         ),
@@ -457,6 +519,7 @@ class CreateNewAccount extends StatelessWidget {
       Map userDataMap = {
         "name" : _username.text.trim(),
         "email" : _email.text.trim(),
+        "phone" : _phone.text,
       };
 
       usersRef.child(firebaseUser.uid).set(userDataMap);
