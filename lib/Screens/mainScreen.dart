@@ -7,13 +7,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi_express_rider/Assistants/geoFireAssistant.dart';
 import 'package:taxi_express_rider/Data/appData.dart';
 import 'package:taxi_express_rider/Models/directionDetails.dart';
+import 'package:taxi_express_rider/Models/nearbyAvailableDrivers.dart';
 import 'package:taxi_express_rider/Widgets/SearchDivider.dart';
 import 'package:taxi_express_rider/Widgets/createMap2.dart';
 import 'package:flutter/cupertino.dart';
@@ -48,8 +51,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
   double searchContainerHeight = 290;
 
   bool drawerOpen = true;
+  bool availableNearbyDriverKeysLoaded = false;
 
   DatabaseReference rideRequestRef;
+
 
   @override
   void initState() {
@@ -167,6 +172,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
       address = address.toString();
     });
     print(address);
+
+    initGeofireListener();
 
   }
 
@@ -860,7 +867,81 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
       circleSet.add(pickUpCircle);
       circleSet.add(destinationCircle);
     });
-
   }
+
+  void initGeofireListener(){
+
+    Geofire.initialize("availableDrivers");
+
+    Geofire.queryAtLocation(currentPosition.latitude, currentPosition.longitude, 15).listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
+
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          case Geofire.onKeyEntered:
+            NearbyAvailableDrivers nearbyAvailableDrivers = NearbyAvailableDrivers();
+            nearbyAvailableDrivers.key = map['key'];
+            nearbyAvailableDrivers.latitude = map['latitude'];
+            nearbyAvailableDrivers.longitude = map['longitude'];
+            GeoFireAssistant.nearbyAvailableDriversList.add(nearbyAvailableDrivers);
+            if(availableNearbyDriverKeysLoaded == true){
+              updateAvailableDriversOnMap();
+            }
+
+            break;
+
+          case Geofire.onKeyExited:
+            GeoFireAssistant.removeDriverFromList(map['key']);
+            updateAvailableDriversOnMap();
+            break;
+
+          case Geofire.onKeyMoved:
+            NearbyAvailableDrivers nearbyAvailableDrivers = NearbyAvailableDrivers();
+            nearbyAvailableDrivers.key = map['key'];
+            nearbyAvailableDrivers.latitude = map['latitude'];
+            nearbyAvailableDrivers.longitude = map['longitude'];
+            GeoFireAssistant.updateNearbyDriverLocation(nearbyAvailableDrivers);
+            updateAvailableDriversOnMap();
+            break;
+
+          case Geofire.onGeoQueryReady:
+            updateAvailableDriversOnMap();
+            break;
+        }
+      }
+
+      setState(() {});
+    });
+
+    }
+
+    Future<void> updateAvailableDriversOnMap() async {
+      setState(() {
+        markerSet.clear();
+      });
+
+      final Uint8List driverIcon = await getBytesFromAsset('images\\car_marker.png', 110);
+
+      Set<Marker> tMarkers = Set<Marker>();
+      for(NearbyAvailableDrivers driver in GeoFireAssistant.nearbyAvailableDriversList){
+        LatLng availableDriverPostion = LatLng(driver.latitude, driver.longitude);
+
+        Marker marker = Marker(
+          markerId: MarkerId('driver${driver.key})'),
+          position: availableDriverPostion,
+          icon: BitmapDescriptor.fromBytes(driverIcon),
+
+        );
+        tMarkers.add(marker);
+      }
+      setState(() {
+        markerSet = tMarkers;
+      });
+    }
+
 
 }

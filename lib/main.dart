@@ -41,9 +41,9 @@ class MyApp extends StatelessWidget {
           fontFamily: "JosefinSans-Medium",
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: '/',
+        initialRoute: FirebaseAuth.instance.currentUser == null ? 'LoginScreen' : 'MainScreen',
         routes: {
-          '/': (context) => FirebaseAuth.instance.currentUser == null ? LoginScreen() : MainScreen(),
+          '/': (context) => LoginScreen(),
           'Forgot Password':(context) => ForgotPassword(),
           'Create New Account':(context) => CreateNewAccount(),
           'MainScreen':(context) => MainScreen(),
