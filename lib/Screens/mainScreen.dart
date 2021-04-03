@@ -87,8 +87,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
       "createdAt" : DateTime.now().toString(),
       "riderName" : usersCurrentInfo.name,
       "riderEmail" : usersCurrentInfo.email,
-      "pickUpAdress" : pickUp.placeName,
-      "destinationAdress" : destination.placeName,
+      "pickUpAddress" : pickUp.placeName,
+      "destinationAddress" : destination.placeName,
     };
 
     rideRequestRef.push().set(rideInfoMap);
@@ -472,7 +472,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
                         ),
                       ),
                       SizedBox(
-                        height: 24.0,
+                        height: 35.0,
                       ),
                       Row(
                         children: [
@@ -490,25 +490,22 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
                               Text("Your Current Location",
                                 style: TextStyle(
                                   color: Color.fromRGBO(146, 27, 31, 1),
-                                  fontSize: 13.0,
+                                  fontSize: 15.0,
                                   fontWeight: FontWeight.bold,
                                 ),),
                               SizedBox(height: 7.0,),
-                              ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minWidth: 300.0,
-                                  maxWidth: 310.0,
-                                  minHeight: 10.0,
-                                  maxHeight: 80.0,
-                                ),
-                                child: Text(
-                                  Provider.of<AppData>(context).pickUpLocation !=
-                                      null ? Provider.of<AppData>(context)
-                                      .pickUpLocation.placeName : "Your Current Location",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Container(
+                                  child: Text(
+                                    Provider.of<AppData>(context).pickUpLocation !=
+                                        null ? Provider.of<AppData>(context)
+                                        .pickUpLocation.placeName : "Your Current Location",
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
