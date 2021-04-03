@@ -494,18 +494,25 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
                                   fontWeight: FontWeight.bold,
                                 ),),
                               SizedBox(height: 7.0,),
-                              Expanded(
-                                child: Container(
-                                  child: Text(
-                                    Provider.of<AppData>(context).pickUpLocation !=
-                                        null ? Provider.of<AppData>(context)
-                                        .pickUpLocation.placeName : "Your Current Location",
-                                    style: TextStyle(
-                                      fontSize: 19,
-                                      fontStyle: FontStyle.italic,
-                                      fontWeight: FontWeight.bold,
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minWidth: 200,
+                                  maxWidth: 300,
+                                ),
+                                child: Expanded(
+                                  child: Container(
+                                    child: Text(
+                                      Provider.of<AppData>(context).pickUpLocation !=
+                                          null ? Provider.of<AppData>(context)
+                                          .pickUpLocation.placeName : "Your Current Location",
+                                      style: TextStyle(
+                                        fontSize: 19,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
