@@ -51,6 +51,8 @@ dependencies:
   path:
   animated_text_kit: ^4.1.0
   firebase_messaging: ^7.0.3
+  url_launcher:
+  smooth_star_rating: ^1.1.1
 
 flutter_icons:
   image_path: "images/taxi_express_icon.png"
@@ -83,6 +85,8 @@ flutter:
     - images\destination_marker.png
     - images\taxi.png
     - images\car_marker.png
+    - images\normal_car.png
+    - images\suv_car.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

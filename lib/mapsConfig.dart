@@ -19,5 +19,11 @@ String driverName = "";
 
 String driverPhone = "";
 
+double starCounter = 0.0;
+
+String title = "";
+
+String carRideType = "";
+
 String serverToken = "key=AAAAuNpojEs:APA91bGHw7uTHWrHu-QMxLFFJO0cWVJ8e-D1Xcy_7lrK"
     "-PPnMCBJ5jIN5ptycRioKNa5NN5M6kfJXX79aBEjYSNZumDZX3HjWLbexuBmBLDR2XIwoSWdwYe7WzSGdRvm0wgQMaufgw09";
