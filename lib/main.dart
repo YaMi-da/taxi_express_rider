@@ -4,6 +4,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_express_rider/Data/appData.dart';
+import 'package:taxi_express_rider/Screens/ProfileScreen.dart';
+import 'package:taxi_express_rider/Screens/aboutScreen.dart';
+import 'package:taxi_express_rider/Screens/historyScreen.dart';
 import 'Screens/screens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/android.dart';
@@ -31,6 +34,8 @@ DatabaseReference usersRef = FirebaseDatabase.instance.reference().child
   ("Users").child("Riders");
 DatabaseReference driversRef = FirebaseDatabase.instance.reference().child
   ("Users").child("Drivers");
+DatabaseReference newRequestRef = FirebaseDatabase.instance.reference().child("RideRequests");
+
 
 
 class MyApp extends StatelessWidget {
@@ -50,6 +55,9 @@ class MyApp extends StatelessWidget {
           'Forgot Password':(context) => ForgotPassword(),
           'Create New Account':(context) => CreateNewAccount(),
           'MainScreen':(context) => MainScreen(),
+          'AboutScreen':(context) => AboutScreen(),
+          'ProfileScreen':(context) => ProfileScreen(),
+          'HistoryScreen':(context) => HistoryScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

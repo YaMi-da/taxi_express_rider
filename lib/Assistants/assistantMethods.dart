@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_express_rider/Assistants/requestAssistant.dart';
@@ -12,8 +13,11 @@ import 'package:taxi_express_rider/Models/Users.dart';
 import 'package:taxi_express_rider/Models/addresses.dart';
 import 'package:taxi_express_rider/Data/appData.dart';
 import 'package:taxi_express_rider/Models/directionDetails.dart';
+import 'package:taxi_express_rider/Models/history.dart';
 import 'package:taxi_express_rider/mapsConfig.dart';
 import 'package:http/http.dart' as http;
+
+import '../main.dart';
 
 class AssistantMethods{
   static Future<dynamic> searchCoordinateAdress(Position position, context)
@@ -127,6 +131,48 @@ class AssistantMethods{
       headers: headerMap,
       body: jsonEncode(sendNotificationMap),
     );
+  }
+
+  static String formatTripDate(String date){
+    DateTime dateTime = DateTime.parse(date);
+    String formattedDate = "${DateFormat.MMMd().format(dateTime)}, ${DateFormat.y().format(dateTime)} - ${DateFormat.jm().format(dateTime)}";
+    return formattedDate;
+  }
+
+  static void retrieveHistoryInfo(context){
+    newRequestRef.orderByChild("riderName").once().then((DataSnapshot dataSnapshot){
+      if(dataSnapshot.value != null){
+        Map<dynamic, dynamic> keys = dataSnapshot.value;
+        int tripCounter = keys.length;
+        Provider.of<AppData>(context, listen: false).updateTripsCounter(tripCounter);
+
+        List<String> tripHistoryKeys = [];
+        keys.forEach((key, value) {
+          tripHistoryKeys.add(key);
+        });
+
+        Provider.of<AppData>(context, listen: false).updateTripKeys(tripHistoryKeys);
+        obtainTripRequestsHistoryData(context);
+      }
+    });
+  }
+
+  static void obtainTripRequestsHistoryData(context){
+    var keys = Provider.of<AppData>(context, listen: false).tripHistoryKeys;
+    for(String key in keys){
+      newRequestRef.child(key).once().then((DataSnapshot snapshot){
+        if(snapshot.value != null){
+
+          newRequestRef.child(key).child("riderName").once().then((DataSnapshot dataSnapshot){
+            String name = snapshot.value.toString();
+            if(name == usersCurrentInfo.name){
+              var history = History.fromSnapShot(snapshot);
+              Provider.of<AppData>(context, listen: false).updateTripHistoryData(history);
+            }
+          });
+        }
+      });
+    }
   }
 
 }

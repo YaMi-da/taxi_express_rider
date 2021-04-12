@@ -17,6 +17,8 @@ import 'package:taxi_express_rider/Assistants/geoFireAssistant.dart';
 import 'package:taxi_express_rider/Data/appData.dart';
 import 'package:taxi_express_rider/Models/directionDetails.dart';
 import 'package:taxi_express_rider/Models/nearbyAvailableDrivers.dart';
+import 'package:taxi_express_rider/Screens/ProfileScreen.dart';
+import 'package:taxi_express_rider/Screens/historyScreen.dart';
 import 'package:taxi_express_rider/Screens/ratingScreen.dart';
 import 'package:taxi_express_rider/Widgets/SearchDivider.dart';
 import 'package:taxi_express_rider/Widgets/collectFareDialog.dart';
@@ -102,6 +104,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
       "createdAt" : DateTime.now().toString(),
       "riderName" : usersCurrentInfo.name,
       "riderEmail" : usersCurrentInfo.email,
+      "riderPhone" : usersCurrentInfo.phone,
       "pickUpAddress" : pickUp.placeName,
       "destinationAddress" : destination.placeName,
       "ride_type" : carRideType,
@@ -321,6 +324,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
 
     uName = usersCurrentInfo.name;
 
+    AssistantMethods.retrieveHistoryInfo(context);
+
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -395,7 +400,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
                             ),
                           ),
                           SizedBox(height: 6.0,),
-                          Text("Visit Profile"),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileScreen()));
+                            },
+                            child: Text(
+                              "Visit Profile",
+                            ),
+                          ),
                         ],
                       )
                     ],
@@ -407,36 +419,51 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
 
               SizedBox(height: 12.0,),
 
-              ListTile(
-                leading: Icon(
-                  Icons.history,
-                ),
-                title: Text(
-                  "History",
-                  style: TextStyle(
-                    fontSize: 15.0,
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> HistoryScreen()));
+                },
+                child: ListTile(
+                  leading: Icon(
+                    Icons.history,
+                  ),
+                  title: Text(
+                    "History",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
                   ),
                 ),
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.person,
-                ),
-                title: Text(
-                  "Visit Profile",
-                  style: TextStyle(
-                    fontSize: 15.0,
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileScreen()));
+                },
+                child: ListTile(
+                  leading: Icon(
+                    Icons.person,
+                  ),
+                  title: Text(
+                    "Visit Profile",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
                   ),
                 ),
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.info,
-                ),
-                title: Text(
-                  "About",
-                  style: TextStyle(
-                    fontSize: 15.0,
+              GestureDetector(
+                onTap: (){
+                  Navigator.pushNamedAndRemoveUntil(context, 'AboutScreen', (route) => false);
+                },
+                child: ListTile(
+                  leading: Icon(
+                    Icons.info,
+                  ),
+                  title: Text(
+                    "About",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
                   ),
                 ),
               ),
