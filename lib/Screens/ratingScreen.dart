@@ -66,27 +66,27 @@ class _RatingScreenState extends State<RatingScreen> {
 
                   if(starCounter == 1){
                     setState(() {
-                      title: "Can't Get Any Worse";
+                      title =  "Can't Get Any Worse";
                     });
                   }
                   if(starCounter == 2){
                     setState(() {
-                      title: "Not So Good";
+                      title = "Not So Good";
                     });
                   }
                   if(starCounter == 3){
                     setState(() {
-                      title: "Have Had Better";
+                      title =  "Have Had Better";
                     });
                   }
                   if(starCounter == 4){
                     setState(() {
-                      title: "Good Ride";
+                      title =  "Good Ride";
                     });
                   }
                   if(starCounter == 5){
                     setState(() {
-                      title: "Can't Get Any Better";
+                      title =  "Can't Get Any Better";
                     });
                   }
                 },
@@ -96,7 +96,8 @@ class _RatingScreenState extends State<RatingScreen> {
 
               Text(
                 title,
-                style: TextStyle(fontSize: 45.0, color: Color.fromRGBO(146, 27, 31, 1),),
+                style: TextStyle(fontSize: 35.0, color: Color.fromRGBO(146, 27, 31, 1),),
+                textAlign: TextAlign.center,
               ),
 
               SizedBox(height: 16.0,),
