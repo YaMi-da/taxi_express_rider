@@ -71,7 +71,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 50.0,),
+            SizedBox(height: 80.0,),
 
             InfoCard(
               text: usersCurrentInfo.phone,
@@ -107,29 +107,38 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 50,),
+            SizedBox(height: 80,),
 
             // ignore: deprecated_member_use
-            RaisedButton(
-              color: Color.fromRGBO(146, 27, 31, 1),
-              onPressed: (){
-                Navigator.pushNamedAndRemoveUntil(context, 'MainScreen', (route) => false);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_back_ios_rounded, color: Colors.black,),
-                  SizedBox(width: 10,),
-                  Text(
-                    "Back to Main Screen",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Container(
+                // ignore: deprecated_member_use
+                child: RaisedButton(
+                  color: Color.fromRGBO(146, 27, 31, 1),
+                  onPressed: (){
+                    Navigator.pushNamedAndRemoveUntil(context, 'MainScreen', (route) => false);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.arrow_back_ios_rounded, color: Colors.white,),
+                        SizedBox(width: 10,),
+                        Text(
+                          "Back to Main Screen",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(10.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0),
+                  ),
+                ),
               ),
             ),
           ],
