@@ -19,7 +19,7 @@ class _AboutScreenState extends State<AboutScreen> {
       body: ListView(
         children: [
           Container(
-            height: 220,
+            height: 320,
             child: Center(
               child: Image.asset('images\\normal_car.png'),
             ),
@@ -31,42 +31,53 @@ class _AboutScreenState extends State<AboutScreen> {
                 Text(
                   "Taxi Express",
                   style: TextStyle(
-                    fontSize: 90,
+                    fontSize: 70,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 30,),
 
                 Text(
                   "Need a Ride? Well, You've Come to The Right Place !",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
                   textAlign: TextAlign.center,
                 )
               ],
             ),
           ),
 
-          SizedBox(height: 40,),
-
-          // ignore: deprecated_member_use
-          RaisedButton(
-            color: Color.fromRGBO(146, 27, 31, 1),
-            onPressed: (){
-              Navigator.pushNamedAndRemoveUntil(context, 'MainScreen', (route) => false);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.arrow_back_ios_rounded, color: Colors.black,),
-                SizedBox(width: 10,),
-                Text(
-                  "Back to Main Screen",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18),
+          SizedBox(height: 50,),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Container(
+              // ignore: deprecated_member_use
+              child: RaisedButton(
+                color: Color.fromRGBO(146, 27, 31, 1),
+                onPressed: (){
+                  Navigator.pushNamedAndRemoveUntil(context, 'MainScreen', (route) => false);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.arrow_back_ios_rounded, color: Colors.black,),
+                      SizedBox(width: 10,),
+                      Text(
+                        "Back to Main Screen",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(10.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+              ),
             ),
           ),
         ],

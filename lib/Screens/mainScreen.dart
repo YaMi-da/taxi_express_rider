@@ -175,6 +175,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
             rideRequestRef.onDisconnect();
             rideRequestRef = null;
             rideStreamSubscription.cancel();
+            rideStreamSubscription = null;
             resetApp();
           }
         }
@@ -417,9 +418,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
 
               DividerWidget(),
 
-              SizedBox(height: 12.0,),
+              SizedBox(height: 40.0,),
 
-              GestureDetector(
+              /*GestureDetector(
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (context)=> HistoryScreen()));
                 },
@@ -434,7 +435,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin{
                     ),
                   ),
                 ),
-              ),
+              ),*/
               GestureDetector(
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileScreen()));
